@@ -687,12 +687,12 @@
         public name: string;
         public url: URL;
         private token: string;
-        private fileID: number;
-        constructor(element: FileElement) {
+        private fileID: string;
+        constructor(element: HTMLDivElement) {
 
-            this.url = new URL(`${element.attributes.dtfullurl}/${element.attributes.dtsafefilenameforurl}`)
-            this.name = element.attributes.dtfilename
-            this.fileID = element.attributes.fileid
+            this.url = new URL(`${element.getAttribute('dtfullurl')}/${element.getAttribute('dtsafefilenameforurl')}`)
+            this.name = element.getAttribute('dtfilename')
+            this.fileID = element.getAttribute('fileid')
         }
         public async init() {
             let details = await (await fetch("https://www.iwara.zip/account/ajax/file_details", {
@@ -1023,7 +1023,7 @@
 
 
     async function analyzeDownloadTask() {
-        let list = document.querySelectorAll('div[fileid]') as unknown as NodeListOf<FileElement>
+        let list = document.querySelectorAll('div[fileid]') as NodeListOf<HTMLDivElement>
         let size = list.length
         let node = renderNode({
             nodeType: 'p',

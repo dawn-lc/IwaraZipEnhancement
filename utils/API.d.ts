@@ -25,30 +25,6 @@ interface IVersion {
 }
 
 
-interface FileElement extends HTMLDivElement {
-    attributes: {
-        dttitle?: string;
-        dtsizeraw?: number;
-        dtuploaddate?: string;
-        dtfullurl?: string;
-        dtfilename?: string;
-        dtsafefilenameforurl?: string;
-        dtstatsurl?: string;
-        dturlhtmlcode?: string;
-        dturlbbcode?: string;
-        dtfilehash?: string;
-        dtextramenuitems?: string;
-        title?: string;
-        fileid?: number;
-        filesize?: string;
-        fileUploadDate?: string;
-        downloadCount?: number;
-        fileOwner?: string;
-        thumbList?: string;
-        filename?: string;
-        filesizeAlt?: string;
-    }
-}
 
 interface IChannelMessage<T> {
     type: MessageType;
