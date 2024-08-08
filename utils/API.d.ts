@@ -26,26 +26,28 @@ interface IVersion {
 
 
 interface FileElement extends HTMLDivElement {
-    dttitle?: string;
-    dtsizeraw?: number;
-    dtuploaddate?: string;
-    dtfullurl?: string;
-    dtfilename?: string;
-    dtsafefilenameforurl?: string;
-    dtstatsurl?: string;
-    dturlhtmlcode?: string;
-    dturlbbcode?: string;
-    dtfilehash?: string;
-    dtextramenuitems?: string;
-    title?: string;
-    fileid?: number;
-    filesize?: string;
-    fileUploadDate?: string;
-    downloadCount?: number;
-    fileOwner?: string;
-    thumbList?: string;
-    filename?: string;
-    filesizeAlt?: string;
+    attributes: {
+        dttitle?: string;
+        dtsizeraw?: number;
+        dtuploaddate?: string;
+        dtfullurl?: string;
+        dtfilename?: string;
+        dtsafefilenameforurl?: string;
+        dtstatsurl?: string;
+        dturlhtmlcode?: string;
+        dturlbbcode?: string;
+        dtfilehash?: string;
+        dtextramenuitems?: string;
+        title?: string;
+        fileid?: number;
+        filesize?: string;
+        fileUploadDate?: string;
+        downloadCount?: number;
+        fileOwner?: string;
+        thumbList?: string;
+        filename?: string;
+        filesizeAlt?: string;
+    }
 }
 
 interface IChannelMessage<T> {
@@ -201,13 +203,13 @@ namespace Iwara {
         id: string
         type: string
     }
-    interface Page{
+    interface Page {
         count: number
         limit: number
         page: number
         results: IResult[]
     }
-    
+
     interface IResult {
         id: string
         createdAt: string
@@ -215,7 +217,7 @@ namespace Iwara {
         user: User
     }
 
-    interface Comment extends IResult{
+    interface Comment extends IResult {
         body: string
         numReplies: number
         parent: null
@@ -240,7 +242,7 @@ namespace Iwara {
         tags: Tag[]
         fileUrl: string
     }
-    
+
     interface Source {
         id: string
         name: string
