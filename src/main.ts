@@ -673,22 +673,6 @@
 
         public inject() {
             if (!unsafeWindow.document.querySelector('#pluginMenu')) {
-                new MutationObserver((mutationsList) => {
-                    for (let mutation of mutationsList) {
-                        if (mutation.type !== 'childList' || mutation.addedNodes.length < 1) {
-                            continue;
-                        }
-                        let pages = ([...mutation.addedNodes].filter(i => isElement(i)) as Element[]).filter(i => i.classList.contains('page'))
-                        if (pages.length < 1) {
-                            continue;
-                        }
-
-                        let page = pages.find(i => i.classList.length > 1)
-                        if (!page) {
-                            continue;
-                        }
-                    }
-                }).observe(unsafeWindow.document.getElementById('app'), { childList: true, subtree: true });
                 originalNodeAppendChild.call(unsafeWindow.document.body, this.interface)
             }
         }
