@@ -1271,11 +1271,7 @@
                     nodeType: 'div',
                     className: 'main',
                     childs: [
-                        { nodeType: 'p', childs: '%#useHelpForBase#%' },
-                        { nodeType: 'p', childs: '%#useHelpForInjectCheckbox#%' },
-                        { nodeType: 'p', childs: '%#useHelpForCheckDownloadLink#%' },
-                        { nodeType: 'p', childs: i18n[language()].useHelpForManualDownload },
-                        { nodeType: 'p', childs: i18n[language()].useHelpForBugreport }
+                        { nodeType: 'p', childs: '%#useHelpForBase#%' }
                     ]
                 },
                 {
