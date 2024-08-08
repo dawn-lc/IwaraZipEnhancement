@@ -12,6 +12,7 @@
     "@types/greasemonkey": "^4.0.4",
     "@types/tampermonkey": "^4.0.10",
     "@types/toastify-js": "^1.12.3",
+    "moment": "^2.30.1",
     "toastify-js": "^1.12.0",
     "typescript": "^5.0.4"
   }
