@@ -1342,7 +1342,7 @@
         notice.showToast()
     }
 
-    if (new Version(GM_getValue('version', '0.0.0')).compare(new Version('3.2.5')) === VersionState.Low) {
+    if (new Version(GM_getValue('version', '0.0.0')).compare(new Version('0.0.1')) === VersionState.Low) {
         GM_setValue('isFirstRun', true)
         alert(i18n[language()].configurationIncompatible)
     }
