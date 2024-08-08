@@ -328,6 +328,7 @@
             browserDownloadModeError: '请启用脚本管理器的浏览器API下载模式!',
             parsingProgress: '解析进度: ',
             downloadFailed: '下载失败！',
+            downloadThis: '下载当前',
             pushTaskFailed: '推送下载任务失败！'
         }
     }
@@ -613,10 +614,6 @@
                 renderNode(this.inputComponent('aria2Path')),
                 renderNode(this.inputComponent('aria2Token', 'password'))
             ]
-            let iwaraDownloaderConfigInput = [
-                renderNode(this.inputComponent('iwaraDownloaderPath')),
-                renderNode(this.inputComponent('iwaraDownloaderToken', 'password'))
-            ]
             let BrowserConfigInput = [
                 renderNode(this.inputComponent('downloadPath'))
             ]
@@ -673,6 +670,14 @@
 
         public inject() {
             if (!unsafeWindow.document.querySelector('#pluginMenu')) {
+                let downloadThisButton = this.button('downloadThis', (name, event) => {
+                    analyzeDownloadTask()
+                })
+                let settingsButton = this.button('settings', (name, event) => {
+                    editConfig.inject()
+                })
+                originalNodeAppendChild.call(this.interfacePage, downloadThisButton)
+                originalNodeAppendChild.call(this.interfacePage, settingsButton)
                 originalNodeAppendChild.call(unsafeWindow.document.body, this.interface)
             }
         }
@@ -936,50 +941,7 @@
     var editConfig = new configEdit(config)
     var pluginMenu = new menu()
 
-    async function analyzeDownloadTask() {
-        let list = document.querySelectorAll('div[fileid]') as NodeListOf<FileElement>
-        let size = list.length
-        let node = renderNode({
-            nodeType: 'p',
-            childs: `%#parsingProgress#%[${list.length}/${size}]`
-        })
-        let start = newToast(ToastType.Info, {
-            node: node,
-            duration: -1
-        })
-        start.showToast()
-
-        for (let index = 0; index < list.length; index++) {
-            const element = list[index];
-            let fileInfo = await (new FileInfo(element)).init()
-            switch (config.downloadType) {
-                case DownloadType.Aria2:
-                   await aria2Download(fileInfo)
-                    break;
-                    case DownloadType.Browser:
-                    
-                    break;
-                default:
-                    break;
-            }
-            node.firstChild.textContent = `${i18n[language()].parsingProgress}[${list.length - (index + 1)}/${size}]`
-        }
-        start.hideToast()
-        if (size != 1) {
-            let completed = newToast(
-                ToastType.Info,
-                {
-                    text: `%#allCompleted#%`,
-                    duration: -1,
-                    close: true,
-                    onClick() {
-                        completed.hideToast()
-                    }
-                }
-            )
-            completed.showToast()
-        }
-    }
+   
 
     function toastNode(body: RenderCode | RenderCode[], title?: string): Element | Node {
         return renderNode({
@@ -1054,6 +1016,54 @@
             }
         } catch (error) {
             throw new Error(`%#downloadPathError#% ["${matchPath.join(',')}"]`)
+        }
+    }
+
+
+
+    async function analyzeDownloadTask() {
+        let list = document.querySelectorAll('div[fileid]') as NodeListOf<FileElement>
+        let size = list.length
+        let node = renderNode({
+            nodeType: 'p',
+            childs: `%#parsingProgress#%[${list.length}/${size}]`
+        })
+        let start = newToast(ToastType.Info, {
+            node: node,
+            duration: -1
+        })
+        start.showToast()
+
+        for (let index = 0; index < list.length; index++) {
+            const element = list[index];
+            let fileInfo = await (new FileInfo(element)).init()
+            switch (config.downloadType) {
+                case DownloadType.Aria2:
+                    aria2Download(fileInfo)
+                    break;
+                case DownloadType.Browser:
+                    browserDownload(fileInfo)
+                    break;
+                default:
+                    othersDownload(fileInfo)
+                    break;
+            }
+            node.firstChild.textContent = `${i18n[language()].parsingProgress}[${list.length - (index + 1)}/${size}]`
+        }
+        start.hideToast()
+        if (size != 1) {
+            let completed = newToast(
+                ToastType.Info,
+                {
+                    text: `%#allCompleted#%`,
+                    duration: -1,
+                    close: true,
+                    onClick() {
+                        completed.hideToast()
+                    }
+                }
+            )
+            completed.showToast()
         }
     }
 
