@@ -318,9 +318,7 @@
             alreadyKnowHowToUse: '我已知晓如何使用!!!',
             notice: [
                 { nodeType: 'br' },
-                '新增下载画质选择功能，开启后输入画质名称脚本会检查是否存在指定的画质是否可以下载，关闭后将默认下载最高画质。',
-                { nodeType: 'br' },
-                '新增失效视频自动查找MMDfans缓存功能，功能默认开启，将在遇到无法解析的视频时尝试寻找MMDfans缓存'
+                '测试版本，发现问题请前往GitHub反馈！'
             ],
             pushTaskSucceed: '推送下载任务成功！',
             connectionTest: '连接测试',
