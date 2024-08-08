@@ -1,0 +1,104 @@
+name: Bug report
+description: Feedback on encountered BUGs, abnormal phenomena in use, etc.
+title: "[Bug]: "
+labels: ["BUG"]
+assignees:
+  - dawn-lc
+body:
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before asking...
+      options:
+      - label: I have searched the existing issues
+        required: true
+      - label: I spent at least 5 minutes thinking and preparing before asking
+        required: true
+      - label: I am using the latest version of the script
+        required: false
+  - type: textarea
+    id: describe
+    attributes:
+      label: Describe your issue
+      description: Briefly describe your issue
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: How to reproduce
+      description: Steps to reproduce the behavior
+      value: |
+        1. Go to '...'
+        2. Click on '....'
+        4. See error
+    validations:
+      required: true
+  - type: dropdown
+    id: browsers
+    attributes:
+      label: What browser are you using?
+      options:
+        - Firefox
+        - Chrome
+        - Safari
+        - Microsoft Edge
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: scriptManager
+    attributes:
+      label: What script manager are you using?
+      options:
+        - Tampermonkey
+        - Tampermonkey Beta
+        - ScriptCat
+        - Violentmonkey
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: What is the version of the script?
+      placeholder: e.g., 3.1.1
+    validations:
+      required: true
+  - type: dropdown
+    id: downloadMode
+    attributes:
+      label: What is the download mode?
+      options:
+        - Aria2
+        - IwaraDownloader
+        - Browser
+        - Others
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Related logs
+      description: Please copy and paste any relevant log output.
+      render: Text
+    validations:
+      required: false
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: |
+        If applicable, add screenshots to help explain your problem.
+        Tip: You can add images or log files by clicking this area and then dragging the file in.
+    validations:
+      required: false
+  - type: textarea
+    id: others
+    attributes:
+      label: Other information
+      description: |
+        Related configuration? Links? References?
+        Anything that can give us a better understanding of the problem you are encountering.
+    validations:
+      required: false
