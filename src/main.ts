@@ -1315,7 +1315,7 @@
             return
         }
         GM_setValue('version', GM_info.script.version)
-
+        pluginMenu.inject()
         let notice = newToast(
             ToastType.Info,
             {
