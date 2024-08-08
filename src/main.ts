@@ -1020,8 +1020,6 @@
         }
     }
 
-
-
     async function analyzeDownloadTask() {
         let list = document.querySelectorAll('div[fileid]') as NodeListOf<HTMLDivElement>
         let size = list.length
@@ -1073,7 +1071,7 @@
             let localPath = analyzeLocalPath(config.downloadPath.replaceVariable(
                 {
                     NowTime: new Date(),
-                    TITLE: name
+                    FileName: name
                 }
             ).trim())
 
@@ -1104,7 +1102,7 @@
             DownloadUrl.searchParams.set('download', analyzeLocalPath(config.downloadPath.replaceVariable(
                 {
                     NowTime: new Date(),
-                    TITLE: Name
+                    FileName: Name
                 }
             ).trim()).filename)
             GM_openInTab(DownloadUrl.href, { active: false, insert: true, setParent: true })
@@ -1147,7 +1145,7 @@
                 name: config.downloadPath.replaceVariable(
                     {
                         NowTime: new Date(),
-                        TITLE: Name
+                        FileName: Name
                     }
                 ).trim(),
                 onerror: (err) => browserDownloadError(err),
