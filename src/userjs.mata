@@ -34,6 +34,5 @@
 // @grant             unsafeWindow
 // @run-at            document-start
 // @require           https://cdn.jsdelivr.net/npm/toastify-js@1.12.0/src/toastify.min.js
-// @require           https://cdn.jsdelivr.net/npm/moment@2.30.1/moment.min.js
 // @resource          toastify-css https://cdn.jsdelivr.net/npm/toastify-js@1.12.0/src/toastify.min.css
 // ==/UserScript==

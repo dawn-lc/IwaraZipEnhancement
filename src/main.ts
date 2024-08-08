@@ -201,12 +201,6 @@
         !isNull(childs) && node.append(...[].concat(childs).map(renderNode))
         return node
     }
-    const findElement = function (element: Element, condition: string) {
-        while (element && !element.matches(condition)) {
-            element = element.parentElement
-        }
-        return element
-    }
     enum ToastType {
         Log,
         Info,
@@ -345,7 +339,7 @@
         constructor() {
             this.language = language()
             this.downloadType = DownloadType.Others
-            this.downloadPath = '/IwaraZip/%#NowTime:YYYY-MM-DD#%/%#FileName#%'
+            this.downloadPath = '/IwaraZip/%#FileName#%'
             this.downloadProxy = ''
             this.aria2Path = 'http://127.0.0.1:6800/jsonrpc'
             this.aria2Token = ''
@@ -514,7 +508,6 @@
                     }
                 ]
             }) as HTMLElement
-            (button.querySelector(`[name='${name}']`) as HTMLInputElement).checked = get !== undefined ? get(name, defaultValue) : this.target[name] ?? defaultValue ?? false
             return button
         }
         private inputComponent(name: string, type?: string, get?: (name: string) => void, set?: (name: string, e: Event) => void): RenderCode {
@@ -1070,7 +1063,6 @@
         (async function (name: string, downloadUrl: URL) {
             let localPath = analyzeLocalPath(config.downloadPath.replaceVariable(
                 {
-                    NowTime: new Date(),
                     FileName: name
                 }
             ).trim())
@@ -1101,7 +1093,6 @@
         (async function (Name: string, DownloadUrl: URL) {
             DownloadUrl.searchParams.set('download', analyzeLocalPath(config.downloadPath.replaceVariable(
                 {
-                    NowTime: new Date(),
                     FileName: Name
                 }
             ).trim()).filename)
