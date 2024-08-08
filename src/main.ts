@@ -289,7 +289,7 @@
         [key: string]: { [key: string]: RenderCode | RenderCode[] }
         public zh_CN = this['zh']
         public zh: { [key: string]: RenderCode | RenderCode[] } = {
-            appName: 'IwaraZIP 增强',
+            appName: 'IwaraZip 增强',
             language: '语言: ',
             downloadPath: '下载到: ',
             downloadProxy: '下载代理: ',
@@ -344,7 +344,7 @@
         constructor() {
             this.language = language()
             this.downloadType = DownloadType.Others
-            this.downloadPath = '/IwaraZIP/%#NowTime:YYYY-MM-DD#%/%#FileName#%'
+            this.downloadPath = '/IwaraZip/%#NowTime:YYYY-MM-DD#%/%#FileName#%'
             this.downloadProxy = ''
             this.aria2Path = 'http://127.0.0.1:6800/jsonrpc'
             this.aria2Token = ''
