@@ -8,7 +8,7 @@ interface String {
     isEmpty(): boolean;
     notEmpty(): boolean;
     toURL(): URL;
-    among(start: string, end: string): string;
+    among(start: string, end: string, greedy?: boolean): string;
     splitLimit(separator: string, limit?: number): string[];
     truncate(maxLength: number): string
     trimHead(prefix: string): string;

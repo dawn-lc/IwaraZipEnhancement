@@ -52,11 +52,12 @@
     }
     String.prototype.among = function (start: string, end: string, greedy: boolean = false) {
         if (this.isEmpty() || start.isEmpty() || end.isEmpty()) return ''
-        if (!greedy && start === end) return ''
-        const startIndex = greedy ? this.indexOf(start) : this.lastIndexOf(start)
+        const startIndex = this.indexOf(start)
         if (startIndex === -1) return ''
-        const endIndex = greedy ? this.lastIndexOf(end) : this.indexOf(end, startIndex + start.length)
-        return (endIndex === -1 || endIndex < startIndex + start.length) ? '' : this.substring(startIndex + start.length, endIndex)
+        const adjustedStartIndex = startIndex + start.length
+        const endIndex = greedy ? this.lastIndexOf(end) : this.indexOf(end, adjustedStartIndex)
+        if (endIndex === -1 || endIndex < adjustedStartIndex) return ''
+        return this.slice(adjustedStartIndex, endIndex)
     }
     String.prototype.splitLimit = function (separator: string, limit?: number) {
         if (this.isEmpty() || isNull(separator)) {
@@ -287,6 +288,8 @@
             language: '语言: ',
             downloadPath: '下载到: ',
             downloadProxy: '下载代理: ',
+            downloadProxyUser: '代理用户名: ',
+            downloadProxyPassword: '下载密码: ',
             aria2Path: 'Aria2 RPC: ',
             aria2Token: 'Aria2 密钥: ',
             rename: '重命名',
@@ -323,6 +326,8 @@
             parsingProgress: '解析进度: ',
             downloadFailed: '下载失败！',
             downloadThis: '下载当前',
+            downloadAll: '下载所有',
+            allCompleted: '全部完成！',
             pushTaskFailed: '推送下载任务失败！'
         }
     }
@@ -333,6 +338,8 @@
         downloadType: DownloadType
         downloadPath: string
         downloadProxy: string
+        downloadProxyUser: string
+        downloadProxyPassword: string
         aria2Path: string
         aria2Token: string
         [key: string]: any
@@ -341,6 +348,8 @@
             this.downloadType = DownloadType.Others
             this.downloadPath = '/IwaraZip/%#FileName#%'
             this.downloadProxy = ''
+            this.downloadProxyUser = ''
+            this.downloadProxyPassword = ''
             this.aria2Path = 'http://127.0.0.1:6800/jsonrpc'
             this.aria2Token = ''
             let body = new Proxy(this, {
@@ -601,7 +610,9 @@
             }
             let downloadConfigInput = [
                 renderNode(this.inputComponent('downloadPath')),
-                renderNode(this.inputComponent('downloadProxy'))
+                renderNode(this.inputComponent('downloadProxy')),
+                renderNode(this.inputComponent('downloadProxyUser')),
+                renderNode(this.inputComponent('downloadProxyPassword')),
             ]
             let aria2ConfigInput = [
                 renderNode(this.inputComponent('aria2Path')),
@@ -663,12 +674,18 @@
 
         public inject() {
             if (!unsafeWindow.document.querySelector('#pluginMenu')) {
-                let downloadThisButton = this.button('downloadThis', (name, event) => {
-                    analyzeDownloadTask()
+                let downloadThisButton = this.button('downloadThis', async (name, event) => {
+                    let title = unsafeWindow.document.querySelector('.image-name-title') as HTMLDivElement 
+                    let downloadButton = unsafeWindow.document.querySelector('button[onclick^="openUrl"]') as HTMLButtonElement
+                    pushDownloadTask(new FileInfo(title.innerText, downloadButton.getAttribute('onclick').among("openUrl('", "');", true)))
+                })
+                let downloadAllButton = this.button('downloadAll', (name, event) => {
+                    manageDownloadTaskQueue()
                 })
                 let settingsButton = this.button('settings', (name, event) => {
                     editConfig.inject()
                 })
+                originalNodeAppendChild.call(this.interfacePage, downloadAllButton)
                 originalNodeAppendChild.call(this.interfacePage, downloadThisButton)
                 originalNodeAppendChild.call(this.interfacePage, settingsButton)
                 originalNodeAppendChild.call(unsafeWindow.document.body, this.interface)
@@ -679,31 +696,73 @@
     class FileInfo {
         public name: string;
         public url: URL;
+        public isInit: boolean;
         private token: string;
         private fileID: string;
-        constructor(element: HTMLDivElement) {
-
-            this.url = new URL(`${element.getAttribute('dtfullurl')}/${element.getAttribute('dtsafefilenameforurl')}`)
-            this.name = element.getAttribute('dtfilename')
-            this.fileID = element.getAttribute('fileid')
+        constructor(name?: string | null, url?: string | null) {
+            if (!isNull(name) || !isNull(url)){
+                this.url = url.toURL()
+                this.name = name
+                this.isInit = true
+            }
         }
-        public async init() {
-            let details = await (await fetch("https://www.iwara.zip/account/ajax/file_details", {
-                "headers": {
-                    "content-type": "application/x-www-form-urlencoded; charset=UTF-8"
-                },
-                "referrer": "https://www.iwara.zip/",
-                "body": `u=${this.fileID}&p=true`,
-                "method": "POST"
-            })).json() as { html: string }
-            this.token = details.html.among('download_token=', '\'')
-            this.url.searchParams.append("download_token", this.token)
+        public async init(element: HTMLDivElement | null) {
+            if (!isNull(element)) {
+                this.url = new URL(`${element.getAttribute('dtfullurl')}/${element.getAttribute('dtsafefilenameforurl')}`)
+                this.name = element.getAttribute('dtfilename')
+                this.fileID = element.getAttribute('fileid')
+                let details = await (await fetch("https://www.iwara.zip/account/ajax/file_details", {
+                    "headers": {
+                        "content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+                    },
+                    "referrer": "https://www.iwara.zip/",
+                    "body": `u=${this.fileID}&p=true`,
+                    "method": "POST"
+                })).json() as { html: string }
+                this.token = details.html.among('download_token=', '\'')
+                this.url.searchParams.append("download_token", this.token)
+            }
             return this
         }
     }
 
     GM_addStyle(GM_getResourceText('toastify-css'))
     GM_addStyle(`
+
+        :root {
+            --body: #f2f2f2;
+            --body-alt: #ededed;
+            --body-dark: #e8e8e8;
+            --body-darker: #dedede;
+            --text: #444;
+            --muted: #848484;
+            --error: #be5046;
+            --error-text: #f8f8ff;
+            --danger: #be5046;
+            --danger-dark: #7b1a11;
+            --danger-text: #f8f8ff;
+            --warning: #dda82b;
+            --warning-dark: #dda82b;
+            --warning-text: white;
+            --success: #45aa63;
+            --wura: #dda82b;
+            --primary: #1abc9c;
+            --primary-text: #f8f8ff;
+            --primary-dark: #19b898;
+            --primary-faded: rgba(26, 188, 156, 0.2);
+            --secondary: #ff004b;
+            --secondary-dark: #eb0045;
+            --white: #f8f8ff;
+            --red: #c64a4a;
+            --green: green;
+            --yellow: yellow;
+            --blue: blue;
+            --admin-color: #d98350;
+            --moderator-color: #9889ff;
+            --premium-color: #ff62cd;
+            color: var(--text)
+        }
+
         .rainbow-text {
             background-image: linear-gradient(to right, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #8b00ff);
             -webkit-background-clip: text;
@@ -804,7 +863,7 @@
         #pluginConfig p label{
             display: flex;
             flex-direction: column;
-            margin: 5px;
+            margin: 5px 0 5px 0;
         }
         #pluginConfig .inputRadioLine {
             display: flex;
@@ -841,8 +900,8 @@
         #pluginConfig input[type='checkbox'].switch::after {
             content: '';
             display: inline-block;
-            width: 1rem;
-            height: 1rem;
+            width: 40%;
+            height: 80%;
             border-radius: 50%;
             background: #fff;
             box-shadow: 0, 0, 2px, #999;
@@ -935,8 +994,6 @@
     var editConfig = new configEdit(config)
     var pluginMenu = new menu()
 
-   
-
     function toastNode(body: RenderCode | RenderCode[], title?: string): Element | Node {
         return renderNode({
             nodeType: 'div',
@@ -1013,7 +1070,21 @@
         }
     }
 
-    async function analyzeDownloadTask() {
+    function pushDownloadTask(fileInfo: FileInfo) {
+        switch (config.downloadType) {
+            case DownloadType.Aria2:
+                aria2Download(fileInfo)
+                break;
+            case DownloadType.Browser:
+                browserDownload(fileInfo)
+                break;
+            default:
+                othersDownload(fileInfo)
+                break;
+        }
+    }
+
+    async function manageDownloadTaskQueue() {
         let list = document.querySelectorAll('div[fileid]') as NodeListOf<HTMLDivElement>
         let size = list.length
         let node = renderNode({
@@ -1027,21 +1098,10 @@
         start.showToast()
 
         for (let index = 0; index < list.length; index++) {
-            const element = list[index];
-            let fileInfo = await (new FileInfo(element)).init()
-            switch (config.downloadType) {
-                case DownloadType.Aria2:
-                    aria2Download(fileInfo)
-                    break;
-                case DownloadType.Browser:
-                    browserDownload(fileInfo)
-                    break;
-                default:
-                    othersDownload(fileInfo)
-                    break;
-            }
+            pushDownloadTask(await (new FileInfo()).init(list[index]))
             node.firstChild.textContent = `${i18n[language()].parsingProgress}[${list.length - (index + 1)}/${size}]`
         }
+
         start.hideToast()
         if (size != 1) {
             let completed = newToast(
@@ -1071,6 +1131,8 @@
                 [downloadUrl.href],
                 prune({
                     'all-proxy': config.downloadProxy,
+                    'all-proxy-user': config.downloadProxyUser,
+                    'all-proxy-passwd': config.downloadProxyPassword,
                     'out': localPath.filename,
                     'dir': localPath.fullPath.replace(localPath.filename, ''),
                     'referer': window.location.hostname,
@@ -1100,7 +1162,7 @@
         }(fileInfo.name, fileInfo.url))
     }
     function browserDownload(fileInfo: FileInfo) {
-        (async function ( Name: string, DownloadUrl: URL) {
+        (async function (Name: string, DownloadUrl: URL) {
             function browserDownloadError(error: Tampermonkey.DownloadErrorResponse | Error) {
                 let errorInfo = getString(Error)
                 if (!(error instanceof Error)) {
@@ -1124,7 +1186,7 @@
                         ], '%#browserDownload#%'),
                         async onClick() {
                             toast.hideToast()
-                            
+
                         }
                     }
                 )
